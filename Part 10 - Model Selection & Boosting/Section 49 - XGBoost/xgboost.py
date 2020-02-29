@@ -13,14 +13,20 @@ X = dataset.iloc[:, 3:13].values
 y = dataset.iloc[:, 13].values
 
 # Encoding categorical data
+from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-labelencoder_X_1 = LabelEncoder()
-X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
-labelencoder_X_2 = LabelEncoder()
-X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
-onehotencoder = OneHotEncoder(categorical_features = [1])
-X = onehotencoder.fit_transform(X).toarray()
+label_encoder = LabelEncoder()
+X[:, 2] = label_encoder.fit_transform(X[:, 2])
+
+column_transformer = ColumnTransformer(
+    [('one_hot_encoder', OneHotEncoder(categories='auto'), [1])],
+    remainder='passthrough'                                         
+)
+X = column_transformer.fit_transform(X)
 X = X[:, 1:]
+
+del label_encoder, column_transformer
+
 
 # Splitting the dataset into the Training set and Test set
 from sklearn.model_selection import train_test_split
